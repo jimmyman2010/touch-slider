@@ -25,6 +25,7 @@
 		
 		var _this = this;
 		this.interval = new Object();
+		this.currentSlide = this.options.startSlide;
 		// reference dom elements
 		this.container = element;
 		this.element = this.container.children[0]; // the slide pane
@@ -62,6 +63,7 @@
 			if(this.options.circle){
 				$(this.element)	.prepend('<li>' + $(this.slides[this.length - 1]).html() + '</li>')
 								.append('<li>' + $(this.slides[1]).html() + '</li>');
+				this.currentSlide++;
 				this.options.startSlide++;
 				this.length = this.slides.length;
 			}
@@ -69,7 +71,7 @@
 			if(this.options.hasNavigation){
 				var navigation = $('<div class="ts-navigation"></div>'),
 					addCircle = (this.length - this.trueLength) / 2,
-					rel = this.options.circle ? this.options.startSlide - 1 : this.options.startSlide;
+					rel = this.options.circle ? this.currentSlide - 1 : this.currentSlide;
 				for (i = 0; i < this.trueLength; i++){
 					var text = this.options.styleNav === 'number' ? i + 1 : '&bull;';
 					$('<a href="javascript:void(0);" rel="' + i + '">' + text + '</a>').appendTo(navigation);
@@ -127,7 +129,7 @@
 			}
 			
 			// set start position and force translate to remove initial flickering
-			this.slide(this.options.startSlide, 0); 
+			this.slide(this.currentSlide, 0); 
 			// show slider element
 			this.container.style.visibility = 'visible';
 		},
@@ -145,19 +147,24 @@
 			style.msTransform = style.OTransform = 'translateX(' + -(index * this.width) + 'px)';
 			//no-csstransitions
 			if(!Modernizr.csstransitions){ //*/
+				if(this.currentSlide === this.options.startSlide){
+					$(this.element).css({'left': -(index * this.width) + 'px'});
+					this.options.startSlide = -1;
+				} else {
 				$(this.element).animate(
 					{'left': -(index * this.width) + 'px'}, 
 					duration, 
 					function(){
 						_this.transitionEnd();
 					});
+				}
 			}
 			// set new index to allow for expression arguments
-			this.options.startSlide = index;
+			this.currentSlide = index;
 		},
 		getPos: function() {
 			// return current index position
-			return this.options.startSlide;
+			return this.currentSlide;
 		},
 		jump: function(index, auto) {
 			// cancel next scheduled automatic transition, if any
@@ -173,7 +180,7 @@
 			this.options.auto = auto || 0;
 			clearTimeout(this.interval);
 			// if not at first slide
-			if (this.options.startSlide > 0) this.slide(this.options.startSlide-1, this.options.speed);
+			if (this.currentSlide > 0) this.slide(this.currentSlide-1, this.options.speed);
 			else this.slide(this.length - 1, this.options.speed); //if first slide return to end
 			if(this.options.circle && this.getPos() === 0) {
 				setTimeout(function(){
@@ -187,7 +194,7 @@
 			this.options.auto = auto || 0;
 			clearTimeout(this.interval);
 
-			if (this.options.startSlide < this.length - 1) this.slide(this.options.startSlide+1, this.options.speed); // if not last slide
+			if (this.currentSlide < this.length - 1) this.slide(this.currentSlide+1, this.options.speed); // if not last slide
 			else this.slide(0, this.options.speed); //if last slide return to start
 			if(this.options.circle && this.getPos() === this.length - 1) {
 				setTimeout(function(){
@@ -231,7 +238,7 @@
 			}
 			// continue processing to next
 			if (this.options.auto) this.begin();
-			this.options.callback(e, this.options.startSlide, this.slides[this.options.startSlide]);
+			this.options.callback(e, this.currentSlide, this.slides[this.currentSlide]);
 		},
 		onTouchStart: function(e) {
 			this.start = {
@@ -248,7 +255,7 @@
 			this.deltaX = 0;
 			// set transition time to 0 for 1-to-1 touch movement
 			//this.element.style.MozTransitionDuration = this.element.style.webkitTransitionDuration = 0;
-			this.slide(this.options.startSlide, 0);
+			this.slide(this.currentSlide, 0);
 			
 			e.stopPropagation();
 		},
@@ -270,15 +277,15 @@
 			  // increase resistance if first or last slide
 				this.deltaX = 
 					this.deltaX / 
-						( (!this.options.startSlide && this.deltaX > 0               // if first slide and sliding left
-						|| this.options.startSlide == this.length - 1              // or if last slide and sliding right
+						( (!this.currentSlide && this.deltaX > 0               // if first slide and sliding left
+						|| this.currentSlide == this.length - 1              // or if last slide and sliding right
 						&& this.deltaX < 0                            // and if sliding at all
 					) ?                      
 					( Math.abs(this.deltaX) / this.width + 1 )      // determine resistance level
 					: 1 );                                          // no resistance if false
 			  // translate immediately 1-to-1
-				//this.element.style.MozTransform = this.element.style.webkitTransform = 'translate3d(' + (this.deltaX - this.options.startSlide * this.width) + 'px,0,0)';
-				this.slide(this.options.startSlide - this.deltaX, 0);
+				//this.element.style.MozTransform = this.element.style.webkitTransform = 'translate3d(' + (this.deltaX - this.currentSlide * this.width) + 'px,0,0)';
+				this.slide(this.currentSlide - this.deltaX, 0);
 				e.stopPropagation();
 			}
 		},
@@ -290,12 +297,12 @@
 				  || Math.abs(this.deltaX) > this.width/2,        // or if slide amt is greater than half the width
 			// determine if slide attempt is past start and end
 				isPastBounds = 
-				  !this.options.startSlide && this.deltaX > 0                          // if first slide and slide amt is greater than 0
-				  || this.options.startSlide == this.length - 1 && this.deltaX < 0;    // or if last slide and slide amt is less than 0
+				  !this.currentSlide && this.deltaX > 0                          // if first slide and slide amt is greater than 0
+				  || this.currentSlide == this.length - 1 && this.deltaX < 0;    // or if last slide and slide amt is less than 0
 			// if not scrolling vertically
 			if (!this.isScrolling) {
 			  // call slide function with slide end value based on isValidSlide and isPastBounds tests
-				this.slide( this.options.startSlide + ( isValidSlide && !isPastBounds ? (this.deltaX < 0 ? 1 : -1) : 0 ), this.options.speed );
+				this.slide( this.currentSlide + ( isValidSlide && !isPastBounds ? (this.deltaX < 0 ? 1 : -1) : 0 ), this.options.speed );
 			}
 			e.stopPropagation();
 		}

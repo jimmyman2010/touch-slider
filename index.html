@@ -17,8 +17,8 @@
 			$(document).ready(function(){
 				$(".touchSlider").touchSlider({
 					auto: 7000,
-					callback: function(){
-						//alert('sdfds');
+					callback: function(e, index, ele){
+						/*console.log(index)*/
 					}
 				});
 			});
@@ -29,10 +29,22 @@
     		<h1>Touch Slider Demo</h1>
 	        <div id='banner' class='touchSlider'>
 				<ul>
-					<li><img src="images/image1.png" alt="image1"/></li>
-					<li><img src="images/image2.png" alt="image2"/></li>
-					<li><img src="images/image3.png" alt="image3"/></li>
-					<li><img src="images/image4.png" alt="image4"/></li>
+					<li>
+						<a href="#"><img src="images/image1.png" alt="image1"/></a>
+						<div class="ts-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry</div>
+					</li>
+					<li>
+						<a href="#"><img src="images/image2.png" alt="image2"/></a>
+						<div class="ts-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry</div>
+					</li>
+					<li>
+						<a href="#"><img src="images/image3.png" alt="image3"/></a>
+						<div class="ts-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry</div>
+					</li>
+					<li>
+						<a href="#"><img src="images/image4.png" alt="image4"/></a>
+						<div class="ts-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry</div>
+					</li>
 				</ul>
 			</div>
 		</div>
