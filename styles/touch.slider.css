@@ -10,7 +10,9 @@ ul, ol{list-style:none}
 * html .clearfix { height: 1%; }
 .clearfix { display: block; }
 /* close commented backslash hack */
-.touchSlider { padding-bottom:20px; width:500px} 
-.ie9 .touchSlider .ts-content{-ms-transform:translateX(0px) !important}
+
+#wrapper{width:400px;margin:0 auto}
+.touchSlider { padding-bottom:20px; width:400px} 
+.ie9  .ts-content{-ms-transform:translateX(0px) !important}
 .touchSlider li div{ margin:0 10px; padding:50px 10px; background:#1db1ff; font-weight:bold; color:#fff; font-size:20px; text-align:center; } 
 .ts-current{font-size:20px;background:red;color:white}

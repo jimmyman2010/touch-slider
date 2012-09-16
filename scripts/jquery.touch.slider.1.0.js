@@ -18,7 +18,7 @@
 			auto: 0,
 			circle: true,
 			hasNavigation: true,
-			styleNav: '',			// set number if you wanna show number pagination
+			styleNav: 'dot',			// set 'number' if you wanna show number pagination
 			hasControl: true
 		};
 		$.extend( this.options, options || {} );
@@ -60,23 +60,26 @@
 			if (this.length < 2) return null;
 			this.trueLength = this.length;
 			if(this.options.circle){
-				$(this.element)	.addClass('ts-content clearfix')
-								.prepend('<li>' + $(this.slides[this.length - 1]).html() + '</li>')
+				$(this.element)	.prepend('<li>' + $(this.slides[this.length - 1]).html() + '</li>')
 								.append('<li>' + $(this.slides[1]).html() + '</li>');
 				this.options.startSlide++;
 				this.length = this.slides.length;
 			}
+			var control = $('<div class="ts-control"></div>').appendTo($(this.container));
 			if(this.options.hasNavigation){
 				var navigation = $('<div class="ts-navigation"></div>'),
-					addCircle = (this.length - this.trueLength) / 2;
+					addCircle = (this.length - this.trueLength) / 2,
+					rel = this.options.circle ? this.options.startSlide - 1 : this.options.startSlide;
 				for (i = 0; i < this.trueLength; i++){
 					var text = this.options.styleNav === 'number' ? i + 1 : '&bull;';
 					$('<a href="javascript:void(0);" rel="' + i + '">' + text + '</a>').appendTo(navigation);
 				}
+				control.append(navigation);
+				
 				$('.ts-navigation a').live('click', function(){
 					_this.jump(parseInt($(this).attr('rel'), 10) + addCircle, _this.options.auto);
 				});
-				$(this.container).append(navigation);
+				$('.ts-navigation a[rel=' + rel + ']').addClass('ts-current');
 			}
 			if(this.options.hasControl){
 				var prev = $('<a href="javascript:void(0);" class="ts-prev" rel="nofollow">prev</a>')
@@ -87,7 +90,7 @@
 							.bind('click', function(e){
 								_this.next(_this.options.auto);
 							});
-				$(this.container).append(prev).append(next);
+				control.prepend(prev).append(next);
 			}
 		},
 		setup: function() {
@@ -104,6 +107,7 @@
 			this.container.style.visibility = 'hidden';
 			// dynamic css
 			this.element.style.width = (this.slides.length * this.width) + 'px';
+			$(this.element).addClass('ts-content clearfix');
 			var index = this.slides.length;
 			while (index--) {
 				var el = this.slides[index];
@@ -123,7 +127,7 @@
 			}
 			
 			// set start position and force translate to remove initial flickering
-			this.slide(this.options.startSlide, 1); 
+			this.slide(this.options.startSlide, 0); 
 			// show slider element
 			this.container.style.visibility = 'visible';
 		},
