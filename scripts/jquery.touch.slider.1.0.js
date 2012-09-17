@@ -19,7 +19,8 @@
 			circle: true,
 			hasNavigation: true,
 			styleNav: 'dot',			// set 'number' if you wanna show number pagination
-			hasControl: true
+			hasControl: true,
+			caption: 'fadeIn'
 		};
 		$.extend( this.options, options || {} );
 		
@@ -43,8 +44,9 @@
 			this.element.addEventListener('touchmove', this, false);
 			this.element.addEventListener('touchend', this, false);
 			this.element.addEventListener('webkitTransitionEnd', this, false);
-			this.element.addEventListener('msTransitionEnd', function(){_this.transitionEnd();}, false);
-			this.element.addEventListener('oTransitionEnd', function(){_this.transitionEnd();}, false);
+			this.element.addEventListener('msTransitionEnd', this, false);
+			this.element.addEventListener('otransitionend', this, false);
+			this.element.addEventListener('oTransitionEnd', this, false);
 			this.element.addEventListener('transitionend', this, false);
 			window.addEventListener('resize', this, false);
 		}
@@ -67,6 +69,7 @@
 				this.options.startSlide++;
 				this.length = this.slides.length;
 			}
+			
 			var control = $('<div class="ts-control"></div>').appendTo($(this.container));
 			if(this.options.hasNavigation){
 				var navigation = $('<div class="ts-navigation"></div>'),
@@ -81,7 +84,6 @@
 				$('.ts-navigation a').live('click', function(){
 					_this.jump(parseInt($(this).attr('rel'), 10) + addCircle, _this.options.auto);
 				});
-				$('.ts-navigation a[rel=' + rel + ']').addClass('ts-current');
 			}
 			if(this.options.hasControl){
 				var prev = $('<a href="javascript:void(0);" class="ts-prev" rel="nofollow">prev</a>')
@@ -94,6 +96,10 @@
 							});
 				control.prepend(prev).append(next);
 			}
+			//set navigation
+			this.setNavigation();
+			//show caption
+			this.showCaption();
 		},
 		setup: function() {
 			var _this = this;
@@ -108,15 +114,7 @@
 			// hide slider element but keep positioning during setup
 			this.container.style.visibility = 'hidden';
 			// dynamic css
-			this.element.style.width = (this.slides.length * this.width) + 'px';
-			$(this.element).addClass('ts-content clearfix');
-			var index = this.slides.length;
-			while (index--) {
-				var el = this.slides[index];
-				el.style.width = this.width + 'px';
-				el.style.display = 'table-cell';
-				el.style.verticalAlign = 'top';
-			}
+			$(this.element).width(this.slides.length * this.width).addClass('ts-content clearfix').children().css({'float':'left'}).width(this.width);
 			//no-csstransitions
 			if(!Modernizr.csstransitions){ //*/
 				var h = parseInt($(this.element).children().height(), 10);
@@ -124,7 +122,6 @@
 				$(this.element).css({'position':'absolute', 'top':'0px'});
 				if(!Modernizr.hashchange){
 					$(this.element).css({'height': h+'px'});
-					$(this.slides).css({'float':'left'});
 				}
 			}
 			
@@ -225,17 +222,30 @@
 				case 'touchend': this.onTouchEnd(e); break;
 				case 'webkitTransitionEnd':
 				case 'msTransitionEnd':
-				case 'oTransitionEnd':
+				case 'otransitionend':
+				case 'oTransitioEnd':
 				case 'transitionend': this.transitionEnd(e); break;
 				case 'resize': this.setup(); break;
 			}
 		},
-		transitionEnd: function(e) {
+		setNavigation: function() {
 			if(this.options.hasNavigation){
 				$('.ts-navigation a').removeClass('ts-current');
-				var pos = this.options.circle ? this.getPos() - 1 : this.getPos();
+				var pos = this.options.circle ? this.currentSlide - 1 : this.currentSlide;
 				$('.ts-navigation a[rel=' + pos + ']').addClass('ts-current');
 			}
+		},
+		showCaption: function() {
+			if(this.options.caption){
+				$(this.element).find('.ts-caption').hide();
+				$(this.slides[this.currentSlide]).children('.ts-caption').show();
+			}
+		},
+		transitionEnd: function(e) {
+			//set navigation
+			this.setNavigation();
+			//show caption
+			this.showCaption();
 			// continue processing to next
 			if (this.options.auto) this.begin();
 			this.options.callback(e, this.currentSlide, this.slides[this.currentSlide]);
