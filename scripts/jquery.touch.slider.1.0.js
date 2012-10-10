@@ -157,6 +157,18 @@
 				}
 			}
 			// set new index to allow for expression arguments
+			if(this.options.circle) {
+				if(index === 0) {
+					setTimeout(function(){
+						_this.slide(_this.length - 2, 1);
+					}, this.options.speed);
+				}
+				if(index === this.length - 1) {
+					setTimeout(function(){
+						_this.slide(1, 1);
+					}, this.options.speed);
+				}
+			}
 			this.currentSlide = index;
 		},
 		getPos: function() {
@@ -179,11 +191,6 @@
 			// if not at first slide
 			if (this.currentSlide > 0) this.slide(this.currentSlide-1, this.options.speed);
 			else this.slide(this.length - 1, this.options.speed); //if first slide return to end
-			if(this.options.circle && this.getPos() === 0) {
-				setTimeout(function(){
-					_this.slide(_this.length - 2, 1);
-				}, this.options.speed);
-			}
 		},
 		next: function(auto) {
 			var _this = this;
@@ -193,11 +200,6 @@
 
 			if (this.currentSlide < this.length - 1) this.slide(this.currentSlide+1, this.options.speed); // if not last slide
 			else this.slide(0, this.options.speed); //if last slide return to start
-			if(this.options.circle && this.getPos() === this.length - 1) {
-				setTimeout(function(){
-					_this.slide(1, 1);
-				}, this.options.speed);
-			}
 		},
 		begin: function() {
 			var _this = this;
@@ -265,6 +267,7 @@
 			this.deltaX = 0;
 			// set transition time to 0 for 1-to-1 touch movement
 			//this.element.style.MozTransitionDuration = this.element.style.webkitTransitionDuration = 0;
+			
 			this.slide(this.currentSlide, 0);
 			
 			e.stopPropagation();
@@ -294,8 +297,8 @@
 					( Math.abs(this.deltaX) / this.width + 1 )      // determine resistance level
 					: 1 );                                          // no resistance if false
 			  // translate immediately 1-to-1
-				//this.element.style.MozTransform = this.element.style.webkitTransform = 'translate3d(' + (this.deltaX - this.currentSlide * this.width) + 'px,0,0)';
-				this.slide(this.currentSlide - this.deltaX, 0);
+				this.element.style.MozTransform = this.element.style.webkitTransform = 'translate3d(' + (this.deltaX - this.currentSlide * this.width) + 'px,0,0)';
+				
 				e.stopPropagation();
 			}
 		},

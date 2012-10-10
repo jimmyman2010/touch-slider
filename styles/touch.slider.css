@@ -17,3 +17,6 @@ ul, ol{list-style:none}
 .touchSlider li{position:relative;float:left}
 .touchSlider li div{position:absolute;bottom:0;left:0; width:400px; background:rgba(170, 230, 92, 0.8); font-weight:bold; color:#fff; font-size:16px;} 
 
+@media screen and (min-width: 601px) and (max-width: 768px){
+	.touchSlider, .touchSlider li div{width:300px} 
+}
