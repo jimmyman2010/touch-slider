@@ -16,7 +16,7 @@
 			speed: 300,
 			callback: function() {},
 			auto: 0,
-			circle: true,
+			circle: false,
 			hasNavigation: true,
 			styleNav: 'dot',			// set 'number' if you wanna show number pagination
 			hasControl: true,
